@@ -2,10 +2,10 @@ version: '3.7'
 
 services:
   mysql:
-    image: mysql:5.7.29
+    image: mysql:8.1.0
     restart: always
     volumes:
-    - /data/mysql/var/lib/mysql:/var/lib/mysql
+    - /data/docker/mysql/var/lib/mysql:/var/lib/mysql
     - /etc/secrets/mysql:/run/secrets
     environment:
       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/root_password
@@ -14,12 +14,12 @@ services:
       MYSQL_PASSWORD_FILE: /run/secrets/password
 
   wordpress:
-    image: wordpress:php7.4-apache
+    image: wordpress:6.3.0-php8.1-apache
     restart: always
     depends_on:
       - mysql
     volumes:
-      - /data/wordpress/var/www/html:/var/www/html
+      - /data/docker/wordpress/var/www/html:/var/www/html
       - /etc/secrets/wordpress:/run/secrets
     environment:
       WORDPRESS_DB_HOST: mysql:3306
@@ -28,25 +28,25 @@ services:
       WORDPRESS_DB_PASSWORD_FILE: /run/secrets/mysql_password
 
   nginx:
-    image: blog-nginx:1.0.0
+    image: website-nginx:1.0.0
     restart: always
     build:
       context: ./nginx
     volumes:
       - /etc/secrets/nginx:/run/secrets
-      - /data/certbot/var/www/certbot:/var/www/certbot
-      - /data/letsencrypt/etc/letsencrypt:/etc/letsencrypt
+      - /data/docker/certbot/var/www/certbot:/var/www/certbot
+      - /data/docker/letsencrypt/etc/letsencrypt:/etc/letsencrypt
     ports:
       - 80:80
       - 443:443
     command: "/bin/sh -c '/scripts/start-nginx.sh'"
 
   certbot:
-    image: blog-certbot:1.0.0
+    image: website-certbot:1.0.0
     restart: always
     build:
       context: ./certbot
     volumes:
-      - /data/certbot/var/www/certbot:/var/www/certbot
-      - /data/letsencrypt/etc/letsencrypt:/etc/letsencrypt
+      - /data/docker/certbot/var/www/certbot:/var/www/certbot
+      - /data/docker/letsencrypt/etc/letsencrypt:/etc/letsencrypt
     entrypoint: "/bin/sh -c '/scripts/start-certbot.sh'"
