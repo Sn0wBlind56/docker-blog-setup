@@ -4,7 +4,7 @@ initialize_certbot() {
   certbot certonly \
     --webroot \
     --webroot-path /var/www/certbot \
-    -d www.example.com -d example.me \
+    -d www.example.com -d example.com \
     --email info@example.com \
     --rsa-key-size 4096 \
     --agree-tos \
